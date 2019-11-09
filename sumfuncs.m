@@ -13,5 +13,5 @@ end;
  % s(1,:)= s(1,:)+y(ii,:);
 %end;
 %end;
-%%
+%% sum of variables
 
