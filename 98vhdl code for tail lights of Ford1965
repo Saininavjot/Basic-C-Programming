@@ -1,0 +1,232 @@
+entity car is
+port(clk, reset,ryt,lft,haz: in std_logic;
+L1,L2,L3,R1,R2,R3,stop:out std_logic);
+end car;
+
+architecture Behavioral of car is
+
+signal lft_signal,ryt_signal: std_logic:= '0';
+type state_type is (S0,S1,S2,S3);
+signal state : state_type;
+begin
+process(clk,reset,ryt,lft,haz)
+begin
+if(reset='1') then 
+state<=S0;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<='0';
+elsif (reset='0') and rising_edge(clk) then
+case state is
+when S0=>
+if(haz='0') and (ryt='0') and (lft='1') then
+state<=S1;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<='0';
+lft_signal<='1';
+ryt_signal<='0';
+elsif(haz='0') and (ryt='1') and (lft='0') then
+state<=S1;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<='0';
+ryt_signal<='1';
+lft_signal<='0';
+elsif(haz='1') and (ryt='1') and (lft='0') then
+state<=S1;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='1';
+R2<='1';
+R3<='1';
+ryt_signal<='1';
+lft_signal<='0';
+stop<='1';
+elsif(haz='1') and (ryt='0') and (lft='1') then
+state<=S1;
+L1<='1';
+L2<='1';
+L3<='1';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<='1';
+ryt_signal<='0';
+lft_signal<='1';
+else
+state<=S0;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+end if;
+when S1 =>
+if (haz='0') and (ryt_signal='0') and (lft_signal='1') then
+state<= S2;
+L1<='1';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<= '0';
+elsif (haz='0') and (ryt_signal='1') and (lft_signal='0') then
+state<= S2;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='1';
+R2<='0';
+R3<='0';
+stop<= '0';
+elsif (haz='1') and (ryt_signal='0') and (lft_signal='1') then
+state<= S2;
+L1<='1';
+L2<='0';
+L3<='0';
+R1<='1';
+R2<='1';
+R3<='1';
+stop<= '1';
+elsif (haz='1') and (ryt_signal='1') and (lft_signal='0') then
+state<= S2;
+L1<='1';
+L2<='1';
+L3<='1';
+R1<='1';
+R2<='0';
+R3<='0';
+stop<= '1';
+else
+state<=S0;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<= '0';
+end if;
+when S2=>
+if (haz='0') and (ryt_signal='0') and (lft_signal='1') then
+state<= S3;
+L1<='1';
+L2<='1';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<= '0';
+elsif (haz='0') and (ryt_signal='1') and (lft_signal='0') then
+state<= S3;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='1';
+R2<='1';
+R3<='0';
+stop<= '0';
+elsif (haz='1') and (ryt_signal='0') and (lft_signal='1') then
+state<= S3;
+L1<='1';
+L2<='1';
+L3<='0';
+R1<='1';
+R2<='1';
+R3<='1';
+stop<= '1';
+elsif (haz='1') and (ryt_signal='1') and (lft_signal='0') then
+state<= S3;
+L1<='1';
+L2<='1';
+L3<='1';
+R1<='1';
+R2<='1';
+R3<='0';
+stop<= '1';
+else
+state<= S0;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<= '1';
+end if;
+when S3=>
+if (haz='0') and (ryt_signal='0') and (lft_signal='1') then
+state<= S0;
+L1<='1';
+L2<='1';
+L3<='1';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<= '0';
+elsif (haz='0') and (ryt_signal='1') and (lft_signal='0') then
+state<= S0;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='1';
+R2<='1';
+R3<='1';
+stop<= '0';
+elsif (haz='1') and (ryt_signal='0') and (lft_signal='1') then
+state<= S0;
+L1<='1';
+L2<='1';
+L3<='1';
+R1<='1';
+R2<='1';
+R3<='1';
+stop<= '1';
+elsif (haz='1') and (ryt_signal='1') and (lft_signal='0') then
+state<= S0;
+L1<='1';
+L2<='1';
+L3<='1';
+R1<='1';
+R2<='1';
+R3<='1';
+stop<= '1';
+else
+state<=S0;
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<= '0';
+end if;
+when others =>
+L1<='0';
+L2<='0';
+L3<='0';
+R1<='0';
+R2<='0';
+R3<='0';
+stop<= '0';
+end case;
+end if;
+end process;
+end Behavioral;
+
