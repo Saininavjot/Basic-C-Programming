@@ -1,3 +1,4 @@
+--vhdl code to design tail lights blinking for ford 1965
 entity car is
 port(clk, reset,ryt,lft,haz: in std_logic;
 L1,L2,L3,R1,R2,R3,stop:out std_logic);
