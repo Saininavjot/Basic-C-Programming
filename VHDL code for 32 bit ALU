@@ -1,0 +1,110 @@
+ 
+    ----------------------------------------------------------------------------------
+    -- Company:
+    -- Engineer:
+    -- 
+    -- Create Date:    23:32:32 11/19/2019
+    -- Design Name:
+    -- Module Name:    vhdl_alu - Behavioral
+    -- Project Name:
+    -- Target Devices:
+    -- Tool versions:
+    -- Description:
+    --
+    -- Dependencies:
+    --
+    -- Revision:
+    -- Revision 0.01 - File Created
+    -- Additional Comments:
+    --
+    ----------------------------------------------------------------------------------
+
+
+    -- Uncomment the following library declaration if using
+    -- arithmetic functions with Signed or Unsigned values
+    --use IEEE.NUMERIC_STD.ALL;
+
+    -- Uncomment the following library declaration if instantiating
+    -- any Xilinx primitives in this code.
+    --library UNISIM;
+    --use UNISIM.VComponents.all;
+
+
+    library ieee;
+        use ieee.std_logic_1164.all;
+        use ieee.numeric_std.all;
+        entity vhdl_alu is
+            port (
+                sel    : in  std_logic_vector(1 downto 0);        -- Operation selector
+                a     : in  std_logic_vector(31 downto 0);    -- First operand
+                b    : in  std_logic_vector(31 downto 0);    -- Second operang
+                
+                cf    : out std_logic;                        -- Carry flag
+                zf    : out std_logic;                        -- Zero flag
+                ov    : out std_logic;                        -- Overflow flag
+                sf    : out std_logic;                        -- Sign flag
+     
+                y    : out std_logic_vector(31 downto 0)    -- Result
+            );
+        end entity vhdl_alu;
+        
+        architecture RTL of vhdl_alu is
+            signal a_us            : unsigned(31 downto 0);            -- Arith. unit 1st operand
+            signal b_us            : unsigned(31 downto 0);            -- Arith. unit 2nd operand
+            signal arith_out    : unsigned(32 downto 0);                -- Arith. unit result
+            signal logic_out    : std_logic_vector(31 downto 0);    -- Logic  unit result
+            signal y_i            : std_logic_vector(31 downto 0);    -- Global result
+        begin
+            -- Sign extension
+            a_us <= unsigned(a);
+            b_us <= unsigned(b);
+            
+            -- OpCode(2) discriminates logic vs. arithmetic operation
+            y_i <= logic_out when sel(1) = '1' else
+                      std_logic_vector(arith_out(31 downto 0));  
+            -- Arithmetic operations logic
+            arith_op : process(sel(0 downto 0), a_us, b_us) is
+            begin
+                case sel(0 downto 0) is
+                   
+                    when "0" =>
+                        arith_out <= ('0' & a_us) + b_us;
+                    when "1" =>
+                        arith_out <= ('0' & a_us) - b_us;
+  when others =>
+                        null;
+                end case;
+            end process arith_op;
+            
+            -- Logic operations logic
+            logic_op : process(sel(0 downto 0), a, b) is
+            begin
+                case sel(0 downto 0) is
+                    when "0" =>
+                        logic_out <= a and b;
+                    when "1" =>
+                        logic_out <= a or b;
+                    when others =>
+                        null;
+                end case;
+            end process logic_op;
+            -- Result
+            y <= y_i;              
+            -- Carry lag
+            cf <= arith_out(32);              
+            -- Overflow flag
+            with sel select
+                ov <=
+                    ((a_us(31) nor b_us(31)) and arith_out(31)) or
+                    (a_us(31) and b_us(31) and not arith_out(31)) when "00",
+                    
+                    (not a_us(31) and b_us(31) and arith_out(31)) or
+                    (a_us(31) and not b_us(31) and not arith_out(31)) when "01",                  
+                    '0' when others;         
+            -- Sign flag
+            sf <= arith_out(31);        
+            -- Zero flag
+            zf <= '1' when y_i = (y_i'range => '0') else
+                  '0';     
+        end architecture RTL;
+
